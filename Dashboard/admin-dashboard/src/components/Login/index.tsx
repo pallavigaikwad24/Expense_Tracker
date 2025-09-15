@@ -37,7 +37,7 @@ export default function LoginPage({ isRegister }: Readonly<LoginProps>) {
         isRegister ? "/api/register" : "/api/login",
         data
       );
-
+      localStorage.setItem("email", data.email);
       router.push("/dashboard");
     } catch (error: unknown) {
       const err = error as AxiosError<{ error: { path: string; msg: string } }>;

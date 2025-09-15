@@ -6,7 +6,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { ExpenseData } from "@/utils/typeDefinition/typeFile";
 
-function ExpenseTable({ expenses }: { expenses: ExpenseData[] }) {
+function ExpenseTable({ expenses }: Readonly<{ expenses: ExpenseData[] }>) {
   type Category = "Food" | "Bill" | "Travel" | "Other";
 
   const getCategoryColor = (category: string): string => {

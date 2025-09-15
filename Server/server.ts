@@ -7,11 +7,11 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 dotenv.config();
 const app = express();
-app.use(cookieParser());
-
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+console.log("FRONTNED_URL:", process.env.FRONTEND_URL);
 
 app.use(express.json());
+app.use(cookieParser());
+app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 
 app.use("/api", loginRoute);
 app.use("/api", dashboardRoute);

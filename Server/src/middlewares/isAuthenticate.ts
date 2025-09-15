@@ -6,9 +6,12 @@ export async function isAuthenticate(
   res: Response,
   next: NextFunction
 ) {
-  const token = res.clearCookie;
+  const { token } = req.query;
+
   if (!token) {
-    return res.status(httpCodes.FORBIDDEN.code).json({ message: "Unauthorized: No token provided" });
+    return res
+      .status(httpCodes.FORBIDDEN.code)
+      .json({ message: "Unauthorized: No token provided" });
   }
   next();
 }

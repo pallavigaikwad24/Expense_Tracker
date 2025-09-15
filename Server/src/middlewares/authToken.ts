@@ -16,15 +16,23 @@ export function authToken(req: Request, res: Response, next: NextFunction) {
     });
 
     // set token in httpOnly cookie
-    res.setHeader(
-      "Set-Cookie",
-      serialize("token", token, {
-        httpOnly: true,
-        path: "/",
-        maxAge: 2 * 60 * 60, // 2 hours in seconds
-        sameSite: "lax",
-      })
-    );
+    // res.setHeader(
+    //   "Set-Cookie",
+    //   serialize("token", token, {
+    //     httpOnly: true,
+    //     path: "/",
+    //     maxAge: 2 * 60 * 60, // 2 hours in seconds
+    //     sameSite: "lax",
+    //   })
+    // );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      maxAge: 2 * 60 * 60 * 1000, // 2 hours in milliseconds
+      sameSite: "lax",
+      secure: false,
+      path: "/",
+    });
 
     next();
   } catch (error) {

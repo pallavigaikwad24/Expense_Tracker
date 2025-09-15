@@ -69,8 +69,9 @@ const ExpensesDashboard: React.FC = () => {
   }
 
   function fetchExpenses() {
+    const email = localStorage.getItem("email");
     axiosInstance(false)
-      .get("/api/expenseall")
+      .post(`/api/expenseall`, { email })
       .then((result) => setExpenses(result.data.data.data))
       .catch((error) => console.log("error 45:", error));
   }
@@ -79,6 +80,7 @@ const ExpensesDashboard: React.FC = () => {
     axiosInstance(false)
       .post("/api/logout")
       .then(() => {
+        localStorage.removeItem("email");
         router.push("/login");
       })
       .catch((error) => console.log("Logout error:", error));

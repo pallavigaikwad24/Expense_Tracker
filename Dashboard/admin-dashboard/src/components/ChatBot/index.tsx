@@ -14,7 +14,7 @@ const ChatbotUI: React.FC<ChatbotUIProps> = ({ setChatView }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
-      text: "Hello! How can I help you today?",
+      text: "What did you spend today?",
       sender: "bot",
       timestamp: new Date(),
     },
