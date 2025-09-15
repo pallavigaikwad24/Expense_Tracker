@@ -3,11 +3,11 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const {email } = await req.json();
+    const { email, month } = await req.json();
     const token = req.headers.get("cookie")?.split("=")[1];
-    const result = await axiosInstance(true).get(`/api/expenseall/${email}?token=${token}`, {
-      withCredentials: true,
-    });
+    const result = await axiosInstance(true).get(
+      `/api/expenseall/${email}?token=${token}&month=${month}`
+    );
     return NextResponse.json({ data: result.data });
   } catch (error) {
     console.log("error from get all expense: ", error);

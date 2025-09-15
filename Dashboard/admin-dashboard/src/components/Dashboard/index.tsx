@@ -15,11 +15,17 @@ import Papa from "papaparse";
 import { useRouter } from "next-nprogress-bar";
 import ChatbotUI from "../ChatBot";
 import ExpenseTable from "./ExpenseTable";
+import { DropDownComponent } from "./DropDownComponent";
 
 const ExpensesDashboard: React.FC = () => {
   const [expenses, setExpenses] = useState<ExpenseData[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [chatView, setChatView] = useState<boolean>(false);
+  const [selectedItem, setSelectedItem] = useState({
+    id: "0",
+    label: "Search by month",
+  });
+
   const router = useRouter();
 
   // Group by category for PieChart
@@ -68,10 +74,10 @@ const ExpensesDashboard: React.FC = () => {
     document.body.removeChild(link);
   }
 
-  function fetchExpenses() {
+  function fetchExpenses(month: string) {
     const email = localStorage.getItem("email");
     axiosInstance(false)
-      .post(`/api/expenseall`, { email })
+      .post(`/api/expenseall`, { email, month })
       .then((result) => setExpenses(result.data.data.data))
       .catch((error) => console.log("error 45:", error));
   }
@@ -86,9 +92,18 @@ const ExpensesDashboard: React.FC = () => {
       .catch((error) => console.log("Logout error:", error));
   }
 
+  // useEffect(() => {
+  //   fetchExpenses("");
+  // }, [isOpen, chatView]);
+
   useEffect(() => {
-    fetchExpenses();
-  }, [isOpen, chatView]);
+    console.log("selectedItem:", selectedItem);
+    if (selectedItem.label === "Search by month") {
+      fetchExpenses("");
+    } else {
+      fetchExpenses(selectedItem.id);
+    }
+  }, [selectedItem, isOpen, chatView]);
 
   return (
     <>
@@ -97,39 +112,49 @@ const ExpensesDashboard: React.FC = () => {
           Expense Tracker Dashboard
         </h1>
         <div className="w-[200%] flex justify-between">
-          <button
-            onClick={downloadCSV}
-            className="cursor-pointer px-6 py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-indigo-500/50 transition-all col-span-1 lg:col-span-2 "
-          >
-            Download CSV
-          </button>
-          <div>
+          <div className="flex w-[100%] gap-2">
+            {/* Download CSV Button */}
+            <button
+              onClick={downloadCSV}
+              className="ml-3 cursor-pointer px-6 py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-indigo-500/50 transition-all  "
+            >
+              Download CSV
+            </button>
+
+            <div className="w-[70%]">
+              <DropDownComponent
+                selectedItem={selectedItem}
+                setSelectedItem={setSelectedItem}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end w-[100%] gap-2">
             {/* AI Button */}
             <button
               onClick={() => setChatView(true)}
-              className=" mr-2 cursor-pointer px-6 py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-indigo-500/50 transition-all col-span-1 lg:col-span-2 "
+              className="cursor-pointer px-6 py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-indigo-500/50 transition-all  "
             >
               <SparklesIcon className="w-6 h-6 inline-block " /> Ask AI
             </button>
             <button
               onClick={() => setIsOpen(true)}
-              className=" cursor-pointer mr-2 px-6 py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-indigo-500/50 transition-all col-span-1 lg:col-span-2 "
+              className=" cursor-pointer px-6 py-3 rounded-xl font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg hover:shadow-indigo-500/50 transition-all  "
             >
               + Add Expense
             </button>
             <button
               onClick={() => handleLogout()}
-              className="cursor-pointer px-6 py-3 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 shadow-lg hover:shadow-indigo-500/50 transition-all col-span-1 lg:col-span-2 "
+              className="cursor-pointer px-6 py-3 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 shadow-lg hover:shadow-indigo-500/50 transition-all "
             >
               Logout
             </button>
           </div>
         </div>
+
         {/* Expenses Table */}
         <div className=" shadow-md rounded-2xl p-4 col-span-1 lg:col-span-2">
           <ExpenseTable expenses={expenses} />
         </div>
-
         {/* Pie Chart */}
         <PieChartComponent categoryData={categoryData} />
 
