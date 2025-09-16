@@ -15,7 +15,6 @@ export async function POST(req: NextRequest) {
         owner,
       }
     );
-    console.log("Result 099999:", result.data);
     return NextResponse.json({ data: result.data });
   } catch (error: unknown) {
     console.log("Error: ", error);

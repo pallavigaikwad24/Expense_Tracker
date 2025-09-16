@@ -17,6 +17,8 @@ import { LoginFormInputs, LoginProps } from "@/utils/typeDefinition/typeFile";
 import { axiosInstance } from "@/utils/axiosInstance";
 import { AxiosError } from "axios";
 import Link from "next/link";
+import crypto from "crypto-js";
+import { encryptionCrypto } from "@/utils/cryptoFun";
 
 export default function LoginPage({ isRegister }: Readonly<LoginProps>) {
   const [showPassword, setShowPassword] = useState(false);
@@ -33,9 +35,11 @@ export default function LoginPage({ isRegister }: Readonly<LoginProps>) {
 
   const onSubmit = async (data: LoginFormInputs): Promise<void> => {
     try {
+      const cryptoPassword = encryptionCrypto(data.password);
+      console.log("Encrypted Password:", cryptoPassword);
       const result = await axiosInstance(false).post(
         isRegister ? "/api/register" : "/api/login",
-        data
+        {...data, password: cryptoPassword}
       );
       localStorage.setItem("email", data.email);
       router.push("/dashboard");

@@ -2,8 +2,9 @@ import {
   CategoryData,
   DateData,
   ExpenseData,
+  Option,
 } from "@/utils/typeDefinition/typeFile";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PieChartComponent from "./PieChartComponent";
 import LineChartComponent from "./LineChartComponent";
 import { ExpenseForm } from "../Form";
@@ -18,15 +19,32 @@ import ExpenseTable from "./ExpenseTable";
 import { DropDownComponent } from "./DropDownComponent";
 
 const ExpensesDashboard: React.FC = () => {
+  const router = useRouter();
   const [expenses, setExpenses] = useState<ExpenseData[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [chatView, setChatView] = useState<boolean>(false);
-  const [selectedItem, setSelectedItem] = useState({
-    id: "0",
-    label: "Search by month",
-  });
 
-  const router = useRouter();
+  // Month List
+  const options: Option[] = [
+    { id: "0", label: "Search by month" },
+    { id: "1", label: "January" },
+    { id: "2", label: "February" },
+    { id: "3", label: "March" },
+    { id: "4", label: "April" },
+    { id: "5", label: "May" },
+    { id: "6", label: "June" },
+    { id: "7", label: "July" },
+    { id: "8", label: "August" },
+    { id: "9", label: "September" },
+    { id: "10", label: "October" },
+    { id: "11", label: "November" },
+    { id: "12", label: "December" },
+  ];
+
+  const [selectedItem, setSelectedItem] = useState(options[0]);
+  // Year List
+  const [yearOptions, setYearOptions] = useState<Option[]>([{ id: "0", label: "Search by year" }]);
+  const [selectedItemYear, setSelectedItemYear] = useState(yearOptions[0]);
 
   // Group by category for PieChart
 
@@ -74,10 +92,10 @@ const ExpensesDashboard: React.FC = () => {
     document.body.removeChild(link);
   }
 
-  function fetchExpenses(month: string) {
+  function fetchExpenses(month: string, year: string) {
     const email = localStorage.getItem("email");
     axiosInstance(false)
-      .post(`/api/expenseall`, { email, month })
+      .post(`/api/expenseall`, { email, month, year })
       .then((result) => setExpenses(result.data.data.data))
       .catch((error) => console.log("error 45:", error));
   }
@@ -92,18 +110,36 @@ const ExpensesDashboard: React.FC = () => {
       .catch((error) => console.log("Logout error:", error));
   }
 
-  // useEffect(() => {
-  //   fetchExpenses("");
-  // }, [isOpen, chatView]);
+  useEffect(() => {
+      const yearArr = Array.from(
+        new Set(expenses.map((expense) => new Date(expense.date).getFullYear()))
+      );
+
+      const years = yearArr.map((year, index) => ({
+        id: (index + 1).toString(),
+        label: year.toString(),
+      }));
+
+      const yearList = [{ id: "0", label: "Search by year" }, ...years];
+      setYearOptions(yearList);
+  }, [expenses]);
 
   useEffect(() => {
-    console.log("selectedItem:", selectedItem);
-    if (selectedItem.label === "Search by month") {
-      fetchExpenses("");
+    fetchExpenses("", "");
+    setSelectedItem({ id: "0", label: "Search by month" });
+    setSelectedItemYear({ id: "0", label: "Search by year" });
+  }, [isOpen, chatView]);
+
+  useEffect(() => {
+    if (
+      selectedItem.label === "Search by month" &&
+      selectedItemYear.label === "Search by year"
+    ) {
+      fetchExpenses("", "");
     } else {
-      fetchExpenses(selectedItem.id);
+      fetchExpenses(selectedItem.id, selectedItemYear.label);
     }
-  }, [selectedItem, isOpen, chatView]);
+  }, [selectedItem, selectedItemYear]);
 
   return (
     <>
@@ -121,10 +157,18 @@ const ExpensesDashboard: React.FC = () => {
               Download CSV
             </button>
 
-            <div className="w-[70%]">
+            <div className="w-[37%]">
               <DropDownComponent
                 selectedItem={selectedItem}
                 setSelectedItem={setSelectedItem}
+                options={options}
+              />
+            </div>
+            <div className="w-[37%]">
+              <DropDownComponent
+                selectedItem={selectedItemYear}
+                setSelectedItem={setSelectedItemYear}
+                options={yearOptions}
               />
             </div>
           </div>

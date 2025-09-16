@@ -43,6 +43,11 @@ export interface Message {
   timestamp: Date;
 }
 
+export interface Option {
+  id: string;
+  label: string;
+}
+
 export interface ChatbotUIProps {
   setChatView: (value: boolean) => void;
 }

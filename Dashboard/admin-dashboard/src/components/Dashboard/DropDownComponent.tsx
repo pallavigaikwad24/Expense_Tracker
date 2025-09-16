@@ -4,39 +4,22 @@ import {
   CheckIcon,
   MagnifyingGlassIcon as Search,
 } from "@heroicons/react/24/outline";
-
-interface Option {
-  id: string;
-  label: string;
-}
+import { Option } from "@/utils/typeDefinition/typeFile";
 
 interface Prop {
   setSelectedItem: (arg: Option) => void;
   selectedItem: Option;
+  options: Option[];
 }
 
 export const DropDownComponent: React.FC<Prop> = ({
   setSelectedItem,
   selectedItem,
+  options,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const options: Option[] = [
-    { id: "1", label: "January" },
-    { id: "2", label: "February" },
-    { id: "3", label: "March" },
-    { id: "4", label: "April" },
-    { id: "5", label: "May" },
-    { id: "6", label: "June" },
-    { id: "7", label: "July" },
-    { id: "8", label: "August" },
-    { id: "9", label: "September" },
-    { id: "10", label: "October" },
-    { id: "11", label: "November" },
-    { id: "12", label: "December" },
-  ];
 
   const filteredOptions = options.filter((option) =>
     option.label.toLowerCase().includes(searchTerm.toLowerCase())
@@ -65,7 +48,7 @@ export const DropDownComponent: React.FC<Prop> = ({
   return (
     <>
       {/* Main Searchable Dropdown */}
-      <div className="w-[30%]">
+      <div className="w-[100%]">
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setIsOpen((prev) => !prev)}

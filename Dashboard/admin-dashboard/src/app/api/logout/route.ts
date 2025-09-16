@@ -4,11 +4,12 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const res = NextResponse.json({ message: "Logged out successfully" });
+    const token = req.headers.get("cookie")?.split("=")[1] || "";
     res.headers.set(
       "Set-Cookie",
       "token=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax"
     );
-    await axiosInstance(true).post("/api/logout");
+    await axiosInstance(true).post(`/api/logout?token=${token}`);
     return res;
   } catch (error) {
     console.log("Logout error:", error);

@@ -1,6 +1,7 @@
 // validations/registerValidation.ts
 import { body } from "express-validator";
 import { User } from "../models/User.js";
+import { cryptoDecryptionFun, decryptionFun } from "../utils/cryptionFun.js";
 
 export const loginValidation = [
   body("email")
@@ -17,8 +18,13 @@ export const loginValidation = [
     .notEmpty()
     .withMessage("Password is required")
     .custom(async (value, { req }) => {
+      const password = cryptoDecryptionFun(value);
       const existEmail = await User.findOne({ email: req.body.email });
-      if (existEmail?.password !== value) {
+      const isPassword = decryptionFun(
+        existEmail?.password as string,
+        password
+      );
+      if (!isPassword) {
         throw new Error("Invalid password!");
       }
     }),
@@ -35,21 +41,20 @@ export const forgotEmailValidation = [
       }
     }),
 ];
+
 export const forgotPasswordValidation = [
   body("password")
     .notEmpty()
     .withMessage("Password is required")
-    .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters long")
-    .matches(/[A-Z]/)
-    .withMessage("Password must contain at least one uppercase letter")
-    .matches(/[a-z]/)
-    .withMessage("Password must contain at least one lowercase letter")
-    .matches(/\d/)
-    .withMessage("Password must contain at least one number")
-    .matches(/[@$!%*?&]/)
-    .withMessage("Password must contain at least one special character"),
-  body("confirm_password")
-    .notEmpty()
-    .withMessage("Confirm Password is required"),
+    .custom((value, { req }) => {
+      const plainText = cryptoDecryptionFun(value);
+      const regex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+      if (!regex.test(plainText)) {
+        throw new Error(
+          "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character"
+        );
+      }
+    }),
 ];

@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { User } from "../models/User.js";
 import { httpCodes } from "../enum/httpCodes.js";
+import { cryptoDecryptionFun, encryptionFun } from "../utils/cryptionFun.js";
 
 export async function registerController(
   req: Request,
@@ -8,10 +9,12 @@ export async function registerController(
 ): Promise<Response> {
   try {
     const { first_name, email, password } = req.body;
+    const plainText = cryptoDecryptionFun(password);
+    const encryptPassword = encryptionFun(plainText);
     const result = await User.create({
       name: first_name,
       email,
-      password,
+      password: encryptPassword,
       createAt: new Date(),
     });
 
@@ -51,7 +54,7 @@ export async function forgotPasswordController(req: Request, res: Response) {
 
     const updatePassword = await User.findOneAndUpdate(
       { email },
-      { password },
+      { password: encryptionFun(password) },
       { new: true }
     );
 

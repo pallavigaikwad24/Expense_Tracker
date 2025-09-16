@@ -5,12 +5,14 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const { first_name, email, password } = await req.json();
+    console.log("payload in register route:", password)
     const api = axiosInstance(true);
     const loginResult = await api.post("/api/register", {
       first_name,
       email,
       password,
     });
+    console.log("Response from register API:", loginResult);
     const setCookieHeader = loginResult.headers["set-cookie"];
     const response = NextResponse.json(loginResult.data.data);
     if (setCookieHeader) {

@@ -8,6 +8,8 @@ export async function isAuthenticate(
 ) {
   const { token } = req.query;
 
+  console.log("Token in isAuthenticate middleware:", token);
+
   if (!token) {
     return res
       .status(httpCodes.FORBIDDEN.code)
